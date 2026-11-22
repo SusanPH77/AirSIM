@@ -271,3 +271,5 @@ AirSIM 采用 [PolyForm Noncommercial License 1.0.0](LICENSE)：
 - 第三方组件继续适用其自身许可证，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 禁止商业用途意味着本项目不符合 OSI 的 Open Source Definition。请使用“源码可见”或 “source-available”描述 AirSIM，而不要将其标注为 OSI 开源软件。
+
+Personal Apple signing: `AIRSIM_MAIN_BUNDLE_ID` configures the main App and all target suffixes consistently; `AIRSIM_DISPLAY_NAME` distinguishes a personal build, and the default widget group follows the main identifier. See `iOS/README.md`. Apple portal registration, matching profiles/APNs credentials, and real-device verification remain required.

@@ -192,3 +192,5 @@ npx wrangler deploy --dry-run --config wrangler.toml
 
 “构建通过”只说明本地编译或测试成功；“部署完成”必须有目标环境的部署结果；“真机可用”必须有实际三星 Android、iPhone/Apple Watch、AVF 和网络链路证据。不能把未执行的步骤写成已完成。
 未发布 Relay 定向命令实现见 docs/relay-agent-routing.md：保持设备鉴权，目标不可变，WSS/HTTP 共享冷却；无额外 iOS 状态轮询。本轮未部署、安装、提交或发布，不能机械修改发布版本基线。
+
+Personal Apple signing: `AIRSIM_MAIN_BUNDLE_ID` configures the main App and all target suffixes consistently; `AIRSIM_DISPLAY_NAME` distinguishes a personal build, and the default widget group follows the main identifier. See `iOS/README.md`. Apple portal registration, matching profiles/APNs credentials, and real-device verification remain required.

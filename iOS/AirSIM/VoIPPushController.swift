@@ -1909,7 +1909,7 @@ final class VoIPPushController: NSObject {
             token: token,
             alertToken: defaults.string(forKey: Keys.alertToken) ?? "",
             watchVoIPToken: defaults.string(forKey: Keys.watchVoIPToken) ?? "",
-            watchBundleID: defaults.string(forKey: Keys.watchBundleID) ?? "com.example.airsim.watchkitapp",
+            watchBundleID: defaults.string(forKey: Keys.watchBundleID) ?? "\(Bundle.main.bundleIdentifier ?? "com.example.airsim").watchkitapp",
             liveActivityPushToStartToken: LiveActivityVisibilityPreference.registrationToken(
                 defaults.string(forKey: Keys.liveActivityPushToStartToken) ?? "",
                 defaults: defaults

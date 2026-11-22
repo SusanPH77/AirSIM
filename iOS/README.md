@@ -227,6 +227,19 @@ xcodebuild -project iOS/AirSIM.xcodeproj \
 5. 在 Apple Developer 为四个正式 Target 创建 Explicit App ID，启用所需 capabilities，并重新生成属于自己 Team 的开发/分发 provisioning profile。
 6. 在 Relay 的 `ALLOWED_BUNDLE_ID` 使用同一个主 App 标识；PushKit、Watch 和 Live Activity 的 APNs topic 会以它为基础生成。
 
+也可在构建时传入 `AIRSIM_MAIN_BUNDLE_ID` 和 `DEVELOPMENT_TEAM`，一次生成主 App、Watch、Live Activity、Notification Service 及测试 Target 的一致标识；`AIRSIM_WIDGET_APP_GROUP` 默认跟随为 `group.<主标识>.widgets`，仍可显式覆盖。`AIRSIM_DISPLAY_NAME` 可区分个人签名版本，默认仍为 AirSIM。这些构建设置不会自动注册 Apple App ID、App Group、证书或推送密钥。
+
+```sh
+xcodebuild -project iOS/AirSIM.xcodeproj -scheme AirSIM \
+  -configuration Release -destination 'generic/platform=iOS' \
+  AIRSIM_MAIN_BUNDLE_ID=org.example.personalairsim \
+  DEVELOPMENT_TEAM=YOUR_TEAM_ID \
+  AIRSIM_DISPLAY_NAME='My AirSIM' \
+  AIRSIM_PUSH_RELAY_URL=https://relay.example.org archive
+```
+
+归档后核对主 App 和每个嵌入扩展的实际 `CFBundleIdentifier`、Watch companion 标识、App Group 与 APNs 环境；构建参数正确不等于 provisioning profile 已包含所需权限。
+
 只替换签名证书而保留其他人的 Bundle ID 不会获得对应 App ID/APNs topic 的权限。主 App、Watch、Live Activity、Notification Service Extension、provisioning profile 与 Relay 必须使用同一套标识关系。
 
 Relay 地址通过 `AIRSIM_PUSH_RELAY_URL` 注入，APNs 环境通过 `AIRSIM_APNS_ENVIRONMENT` 配置。Debug 开发签名对应 APNs `sandbox`，Release/TestFlight 对应 `production`。
