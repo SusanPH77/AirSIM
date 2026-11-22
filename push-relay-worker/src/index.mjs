@@ -11,6 +11,7 @@ import {
 import { constantTimeEqual, sha256Hex } from "./auth-crypto.mjs";
 import { handleFeedback } from "./feedback.mjs";
 import { batteryStatus } from "./battery-status.mjs";
+import { agentDisplayName } from "./agent-display-name.mjs";
 import { RoutingError, parseAgentID, agentSocketKey, matchesTarget, resolveTarget, requestAgentID } from "./command-routing.mjs";
 import {
   authenticateAndReadAgentHeartbeats,
@@ -1541,13 +1542,14 @@ async function receiveAgentHeartbeat(request, env) {
   }
   const agentID = stringValue(heartbeat.agent_id) || "legacy";
   const battery = batteryStatus(heartbeat.battery);
+  const deviceName = agentDisplayName(env, agentID, heartbeat.device_name);
   const record = {
     received_at_ms: Date.now(),
     ...(battery ? { battery } : {}),
     agent_id: agentID,
     ...(heartbeat.command_routing_version === 1 ? {command_routing_version:1} : {}),
     ...(nonEmpty(heartbeat.agent_kind) ? { agent_kind: heartbeat.agent_kind.trim() } : {}),
-    ...(nonEmpty(heartbeat.device_name) ? { device_name: heartbeat.device_name.trim() } : {}),
+    ...(deviceName ? { device_name: deviceName } : {}),
     ...(nonEmpty(heartbeat.manufacturer) ? { manufacturer: heartbeat.manufacturer.trim() } : {}),
     ...(nonEmpty(heartbeat.model) ? { model: heartbeat.model.trim() } : {}),
     // Heartbeats from current Agents always carry phone_number. An empty

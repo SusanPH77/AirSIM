@@ -26,6 +26,7 @@ MIGRATIONS=v1-call-media,v2-agent-status,v3-device-commands
 MIGRATION_RULE=preserve existing order; append new tags only
 
 [PLAIN_VARS]
+AGENT_NAME_OVERRIDES=optional JSON string mapping agent_id to cloud display alias; next heartbeat; no auth or routing changes
 APNS_TEAM_ID=Apple Team identifier; not secret
 APNS_KEY_ID=Apple APNs key identifier; not private key
 ALLOWED_BUNDLE_ID=operator-owned main App Bundle ID
