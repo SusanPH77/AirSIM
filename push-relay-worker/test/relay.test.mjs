@@ -1526,6 +1526,33 @@ test("device status keeps standalone and AVF agents as separate routes", async (
   assert.equal(status.agents.find((agent) => agent.agent_id === "xiaomi-standalone").phone_number, "+8613800000001");
 });
 
+test("configured agent name survives new heartbeats without changing identity or other agents", async () => {
+  const env = testEnvironment();
+  env.AGENT_NAME_OVERRIDES = JSON.stringify({ "android-A": "ZTE CN" });
+  await worker.fetch(post("/v1/devices/register", registration), env);
+  const heartbeat = {
+    ...registration, event: "agent_heartbeat", agent_id: "android-A",
+    device_name: "ZTE MU3356", manufacturer: "ZTE", model: "MU3356",
+    at_ok: true, cellular_state: "registered", command_routing_version: 1,
+  };
+  assert.equal((await worker.fetch(post("/v1/events/heartbeat", heartbeat), env)).status, 202);
+  assert.equal((await worker.fetch(post("/v1/events/heartbeat", { ...heartbeat, agent_id: "android-B" }), env)).status, 202);
+  assert.equal((await worker.fetch(post("/v1/events/heartbeat", heartbeat), env)).status, 202);
+  const read = async () => (await worker.fetch(post("/v1/devices/status", registration), env)).json();
+  let status = await read();
+  assert.equal(status.agents.length, 2);
+  const renamed = status.agents.find(agent => agent.agent_id === "android-A");
+  assert.equal(renamed.device_name, "ZTE CN");
+  assert.equal(renamed.model, "MU3356");
+  assert.equal(renamed.command_routing_version, 1);
+  assert.equal(status.agents.find(agent => agent.agent_id === "android-B").device_name, "ZTE MU3356");
+  assert.equal((await worker.fetch(post("/v1/events/heartbeat", { ...heartbeat, device_secret: "wrong" }), env)).status, 401);
+  delete env.AGENT_NAME_OVERRIDES;
+  await worker.fetch(post("/v1/events/heartbeat", heartbeat), env);
+  status = await read();
+  assert.equal(status.agents.find(agent => agent.agent_id === "android-A").device_name, "ZTE MU3356");
+});
+
 test("wrong device secret is rejected before APNs", async () => {
   const env = testEnvironment();
   await worker.fetch(post("/v1/devices/register", registration), env);

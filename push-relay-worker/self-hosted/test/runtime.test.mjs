@@ -30,6 +30,7 @@ test('real workerd: auth, heartbeat, command dedup/routing, duplex PCM, persiste
   t.after(() => new Promise(r => { apns.closeAllConnections(); apns.close(r); }));
   const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
   const config = { APNS_TEAM_ID: 'synthetic-team', APNS_KEY_ID: 'synthetic-key', APNS_P8: privateKey.export({ type: 'pkcs8', format: 'pem' }), DASHBOARD_TOKEN: 'test-only-'.repeat(8), ALLOWED_BUNDLE_ID: 'com.example.airsim' };
+  config.AGENT_NAME_OVERRIDES = JSON.stringify({ 'synthetic-agent': 'ZTE CN' });
   const configPath = join(dir, 'config.capnp');
   await writeFile(configPath, generateConfig({ config, dataDir, httpPort, maintenancePort, apnsPort }));
   let child, logs = '', sockets = [];
@@ -66,6 +67,10 @@ test('real workerd: auth, heartbeat, command dedup/routing, duplex PCM, persiste
   assert.equal((await post('/v1/devices/register', { ...reg, device_secret: 'wrong'.repeat(10) })).status, 401);
   const heartbeat = { ...auth, event: 'agent_heartbeat', agent_id: 'synthetic-agent', at_ok: true, cellular_state: 'registered' };
   assert.equal((await post('/v1/events/heartbeat', heartbeat)).status, 202);
+  const namedStatus = await (await post('/v1/devices/status', auth)).json();
+  assert.equal(namedStatus.device_name, 'ZTE CN');
+  assert.equal(namedStatus.agents[0].device_name, 'ZTE CN');
+  assert.equal(namedStatus.active_agent_id, 'synthetic-agent');
   const agentCommands = await socket('/v2/devices/synthetic-selfhost/commands/connect?agent_id=synthetic-agent', { headers: { Authorization: 'Bearer ' + auth.device_secret } });
   const command = { ...auth, command_id: 'c87f982a-1750-4f03-9a96-6553e454f522', type: 'dial', number: '123456', target_agent_id: 'synthetic-agent' };
   const first = await post('/v2/commands/enqueue', command, { 'x-forwarded-proto': 'https' });
@@ -92,6 +97,8 @@ test('real workerd: auth, heartbeat, command dedup/routing, duplex PCM, persiste
   assert.equal(pushRequests[0].payload.call_id, 'synthetic-incoming');
   // No real device is registered or dialled; only synthetic sockets on loopback.
   await stop(); await start();
+  assert.equal((await post('/v1/events/heartbeat', { ...heartbeat, device_name: 'ZTE MU3356' })).status, 202);
+  assert.equal((await (await post('/v1/devices/status', auth)).json()).device_name, 'ZTE CN');
   assert.equal((await post('/v1/devices/register', { ...reg, device_secret: 'wrong'.repeat(10) })).status, 401);
   const after = await (await post('/v2/commands/enqueue', command)).json();
   assert.equal(after.duplicate, true);

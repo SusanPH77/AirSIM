@@ -9,7 +9,7 @@ export function generateConfig({ config, dataDir, httpPort = 8787, maintenancePo
     if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('invalid port');
   }
   const names = ['APNS_TEAM_ID', 'APNS_KEY_ID', 'APNS_P8', 'ALLOWED_BUNDLE_ID', 'DASHBOARD_TOKEN',
-    'NOTION_TOKEN', 'NOTION_DATABASE_ID', 'WEBRTC_TRANSPORT_READY', 'WEBRTC_ROLLOUT_PERCENT'];
+    'NOTION_TOKEN', 'NOTION_DATABASE_ID', 'WEBRTC_TRANSPORT_READY', 'WEBRTC_ROLLOUT_PERCENT', 'AGENT_NAME_OVERRIDES'];
   if (!config.DASHBOARD_TOKEN || config.DASHBOARD_TOKEN.length < 32) throw new Error('DASHBOARD_TOKEN must contain at least 32 characters');
   if (!config.ALLOWED_BUNDLE_ID) throw new Error('ALLOWED_BUNDLE_ID is required');
   if (config.WEBRTC_TRANSPORT_READY === 'true') throw new Error('This deployment only implements legacy_pcm');
