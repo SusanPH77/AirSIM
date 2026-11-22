@@ -141,3 +141,5 @@ Apps `v0.9.7.2`：Android `0.9.7.2 (91)`、iOS `0.9.7 (91)`，见 `docs/releases
 # 工作区补充：应用更新（2026-10-19，未发布）
 
 iOS／Android 首次安装或升级后的离线说明、设置重看与应用新版检查见 `docs/app-updates.md`。与 AVF Linux Agent 的 Latest／Debian 更新独立，每日自动尝试包含失败、手动可重试，不自动下载、安装或发布。发布时维护包内说明，Android 同版本比较需资产名含 `-buildNN`，不能借用 iOS build。
+
+Personal Apple signing: `AIRSIM_MAIN_BUNDLE_ID` configures the main App and all target suffixes consistently; `AIRSIM_DISPLAY_NAME` distinguishes a personal build, and the default widget group follows the main identifier. See `iOS/README.md`. Apple portal registration, matching profiles/APNs credentials, and real-device verification remain required.
